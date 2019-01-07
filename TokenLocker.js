@@ -12,7 +12,7 @@ var TokenLocker = TokenLocker || (function () {
 
     //---- INFO ----//
 
-    var version = '0.1',
+    var version = '1.0',
 
     checkInstall = function() {
         if (!_.has(state, 'TokenLocker')) state['TokenLocker'] = state['TokenLocker'] || {};
@@ -106,7 +106,7 @@ var TokenLocker = TokenLocker || (function () {
     },
 
 	showDialog = function (title, content) {
-		// Outputs a 5e Shaped dialog box strictly for GM
+		// Outputs a 5e Shaped dialog box for the GM
         var message = '/w GM &{template:5e-shaped} {{title=' + title + '}} {{content=' + content + '}}';
         sendChat('TokenLocker', message, null, {noarchive:true});
 	},
