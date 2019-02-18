@@ -12,12 +12,26 @@ var TokenLocker = TokenLocker || (function () {
 
     //---- INFO ----//
 
-    var version = '1.0',
+    var version = '1.1',
+    styles = {
+        box:  'background-color: #fff; border: 1px solid #000; padding: 8px 10px; border-radius: 6px; margin-left: -40px; margin-right: 0px;',
+        title: 'padding: 0 0 10px 0; color: ##591209; font-size: 1.5em; font-weight: bold; font-variant: small-caps; font-family: "Times New Roman",Times,serif;',
+        button: 'background-color: #000; border-width: 0px; border-radius: 5px; padding: 5px 8px; color: #fff; text-align: center;',
+        textButton: 'background-color: transparent; border: none; padding: 0; color: #591209; text-decoration: underline;',
+        code: 'font-family: "Courier New", Courier, monospace; background-color: #ddd; color: #000; padding: 2px 4px;',
+    },
 
     checkInstall = function() {
-        if (!_.has(state, 'TokenLocker')) state['TokenLocker'] = state['TokenLocker'] || {};
+        var firstTime = false;
+        if (!_.has(state, 'TokenLocker')) {
+            state['TokenLocker'] = state['TokenLocker'] || {};
+            firstTime = true;
+        }
         if (typeof state['TokenLocker'].lockedTokens == 'undefined') state['TokenLocker'].lockedTokens = {};
+
         log('--> TokenLocker v' + version + ' <-- Initialized. You currently have ' + _.size(state['TokenLocker'].lockedTokens) + ' token(s) locked.');
+        if (firstTime) showDialog('Welcome', 'Thanks for using TokenLocker!<br><br><div align="center"><a style="'
+            + styles.button + '" href="!tl --help">&#8594; Get Started &#8592;</a></div>');
     },
 
     //----- INPUT HANDLER -----//
@@ -63,6 +77,7 @@ var TokenLocker = TokenLocker || (function () {
     commandLock = function(msg, action, pos, rot) {
         if (!msg.selected || !msg.selected.length) {
             sendChat('TokenLocker', '/w GM No tokens are selected!', null, {noarchive:true});
+            howDialog('Error', 'No tokens are selected!');
             return;
         }
 		// Add/Remove token(s) from list of those to be locked
@@ -83,12 +98,12 @@ var TokenLocker = TokenLocker || (function () {
 
         // Provide feedback
         if (action == 'unlock') {
-            sendChat('TokenLocker', '/w GM Selected token(s) unlocked.', null, {noarchive:true});
+            showDialog('', 'Selected token(s) unlocked.');
         } else {
             let which = [];
             if (pos) which.push('Position');
             if (rot) which.push('Rotation');
-            sendChat('TokenLocker', '/w GM ' + which.join(' and ') + ' locked for selected token(s).', null, {noarchive:true});
+            showDialog('', which.join(' and ') + ' locked for selected token(s).');
         }
 	},
 
@@ -96,19 +111,20 @@ var TokenLocker = TokenLocker || (function () {
         var message = '<b>!tl --help</b><br>Sends this Help dialog to the chat window.<br><br>'
         + '<b>!tl --lock</b><br>Locks the position <i>and</i> rotation of the selected token(s). Attempts <b>by anyone</b> to move or rotate '
         + 'the token will result in a reset to the previous position/rotation.<br><br>'
-        + '<b>!tl --lock pos rot</b><br>Locks the position <i>and</i> rotation of the selected token(s). The "pos" and "rot" options can be in any order.<br><br>'
-        + '<b>!tl --lock pos</b><br>Locks only the position of the selected token(s). Rotation is still changable or will be unlocked.<br><br>'
-        + '<b>!tl --lock rot</b><br>Locks only the rotation of the selected token(s). Position is still changable or will be unlocked.<br><br>'
+        + '<b>!tl --lock pos rot</b><br>Locks the position <i>and</i> rotation of the selected token(s) just like above. The "pos" and "rot" options can be in any order.<br><br>'
+        + '<b>!tl --lock pos</b><br>Locks <i>only</i> the position of the selected token(s). Rotation is still changable or will be unlocked.<br><br>'
+        + '<b>!tl --lock rot</b><br>Locks <i>only</i> the rotation of the selected token(s). Position is still changable or will be unlocked.<br><br>'
         + '<b>!tl --unlock</b><br>Unlocks both the position and rotation of the selected token(s).<br><br>'
-        + '<b>!tl --show</b><br>Adds the <i>padlock</i> status marker to all locked tokens so they are easily recognizable. This will be visible to all players.<br><br>'
+        + '<b>!tl --show</b><br>Adds the <i>padlock</i> status marker to all locked tokens so they are easily recognizable. This <i>will</i> be visible to all players.<br><br>'
         + '<b>!tl --hide</b><br>Removes the <i>padlock</i> status marker from all locked tokens.';
         showDialog('Help Menu', message);
     },
 
 	showDialog = function (title, content) {
-		// Outputs a 5e Shaped dialog box for the GM
-        var message = '/w GM &{template:5e-shaped} {{title=' + title + '}} {{content=' + content + '}}';
-        sendChat('TokenLocker', message, null, {noarchive:true});
+        // Constructs a dialog box for chat output
+        title = (title == '') ? '' : '<div style=\'' + styles.title + '\'>' + title + '</div>';
+        var body = '<div style=\'' + styles.box + '\'>' + title + '<div>' + content + '</div></div>';
+        sendChat('TokenLocker','/w GM ' + body, null, {noarchive:true});
 	},
 
     commandShowHide = function(msg, action) {
