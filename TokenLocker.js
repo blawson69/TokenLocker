@@ -22,16 +22,9 @@ var TokenLocker = TokenLocker || (function () {
     },
 
     checkInstall = function() {
-        var firstTime = false;
-        if (!_.has(state, 'TokenLocker')) {
-            state['TokenLocker'] = state['TokenLocker'] || {};
-            firstTime = true;
-        }
+        if (!_.has(state, 'TokenLocker')) state['TokenLocker'] = state['TokenLocker'] || {};
         if (typeof state['TokenLocker'].lockedTokens == 'undefined') state['TokenLocker'].lockedTokens = {};
-
         log('--> TokenLocker v' + version + ' <-- Initialized. You currently have ' + _.size(state['TokenLocker'].lockedTokens) + ' token(s) locked.');
-        if (firstTime) showDialog('Welcome', 'Thanks for using TokenLocker!<br><br><div align="center"><a style="'
-            + styles.button + '" href="!tl --help">&#8594; Get Started &#8592;</a></div>');
     },
 
     //----- INPUT HANDLER -----//
