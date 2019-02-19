@@ -69,8 +69,7 @@ var TokenLocker = TokenLocker || (function () {
 
     commandLock = function(msg, action, pos, rot) {
         if (!msg.selected || !msg.selected.length) {
-            sendChat('TokenLocker', '/w GM No tokens are selected!', null, {noarchive:true});
-            howDialog('Error', 'No tokens are selected!');
+            showDialog('Error', 'No tokens are selected!');
             return;
         }
 		// Add/Remove token(s) from list of those to be locked
