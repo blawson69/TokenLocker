@@ -4,7 +4,7 @@ locks the position and/or rotation of selected tokens.
 
 On Github:	https://github.com/blawson69
 Contact me: https://app.roll20.net/users/1781274/ben-l
-Like this script? Buy me a coffee: https://venmo.com/theBenLawson
+Like this script? Buy me a coffee: https://venmo.com/theRealBenLawson
 */
 
 var TokenLocker = TokenLocker || (function () {
