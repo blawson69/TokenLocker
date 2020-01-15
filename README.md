@@ -1,6 +1,6 @@
 # TokenLocker
 
-> **New in v1.1:** TokenLocker has been updated to support the new [custom token markers](https://wiki.roll20.net/Custom_Token_Markers).
+> **New in v1.2:** TokenLocker has been updated to support the new [custom token markers](https://wiki.roll20.net/Custom_Token_Markers).
 
 This [Roll20](http://roll20.net/) script allows the GM to lock the position and/or the rotation of selected tokens.
 
