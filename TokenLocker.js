@@ -14,7 +14,7 @@ var TokenLocker = TokenLocker || (function () {
 
     //---- INFO ----//
 
-    var version = '1.2',
+    var version = '1.2.1',
     debugMode = false,
     MARKERS,
     ALT_MARKERS = [{name:'red', tag: 'red', url:"#C91010"}, {name: 'blue', tag: 'blue', url: "#1076C9"}, {name: 'green', tag: 'green', url: "#2FC910"}, {name: 'brown', tag: 'brown', url: "#C97310"}, {name: 'purple', tag: 'purple', url: "#9510C9"}, {name: 'pink', tag: 'pink', url: "#EB75E1"}, {name: 'yellow', tag: 'yellow', url: "#E5EB75"}, {name: 'dead', tag: 'dead', url: "X"}],
@@ -132,7 +132,9 @@ var TokenLocker = TokenLocker || (function () {
 
         var curr_marker = _.find(MARKERS, function (x) { return x.tag == state['TokenLocker'].marker; });
         if (typeof curr_marker == 'undefined') curr_marker = _.find(ALT_MARKERS, function (x) { return x.tag == state['TokenLocker'].marker; });
-        message += '<hr><h4>Locked Token Marker</h4>' + getMarker(curr_marker.tag, marker_style) + 'This is the current Locked token marker. You may change it below.';
+        message += '<hr><h4>Locked Token Marker</h4>' + getMarker(curr_marker, marker_style);
+        if (typeof curr_marker == 'undefined') message += '<b style="color: #c00;">Warning:</b> The token marker "' + state['TokenLocker'].marker + '" is invalid!';
+        else message += 'This is the current Locked token marker. You may change it below.';
         message += '<div style="' + styles.buttonWrapper + '"><a style="' + styles.button + '" href="!tl markers" title="This may result in a very long list...">Choose Marker</a></div>';
         message += '<div style="text-align: center;"><a style="' + styles.textButton + '" href="!tl --set-marker &#63;&#123;Status Marker&#124;&#125;">Set manually</a></div>';
 
@@ -167,21 +169,21 @@ var TokenLocker = TokenLocker || (function () {
     commandShowMarkers = function () {
         var message = '<table style="border: 0; width: 100%;" cellpadding="0" cellspacing="2">';
         _.each(ALT_MARKERS, function (marker) {
-            message += '<tr><td>' + getMarker(marker.tag, 'margin-right: 10px;') + '</td><td style="white-space: nowrap; width: 100%;">' + marker.name + '</td>';
-            if (marker == state['TokenLocker'].marker) {
+            message += '<tr><td>' + getMarker(marker, 'margin-right: 10px;') + '</td><td style="white-space: nowrap; width: 100%;">' + marker.name + '</td>';
+            if (marker.tag == state['TokenLocker'].marker) {
                 message += '<td style="text-align: center;">Current</td>';
             } else {
-                message += '<td style="text-align: center; white-space: nowrap; padding: 7px;"><a style="' + styles.button + '" href="!tl set-marker ' + marker.tag + '">Set Marker</a></td>';
+                message += '<td style="text-align: center; white-space: nowrap; padding: 2px;"><a style="' + styles.button + '" href="!tl set-marker ' + marker.tag + '">Set Marker</a></td>';
             }
             message += '</tr>';
         });
 
         _.each(MARKERS, function (icon) {
-            message += '<tr><td>' + getMarker(icon.tag, 'margin-right: 10px;') + '</td><td style="white-space: nowrap; width: 100%;">' + icon.name + '</td>';
+            message += '<tr><td>' + getMarker(icon, 'margin-right: 10px;') + '</td><td style="white-space: nowrap; width: 100%;">' + icon.name + '</td>';
             if (icon.tag == state['TokenLocker'].marker) {
                 message += '<td style="text-align: center;">Current</td>';
             } else {
-                message += '<td style="text-align: center; white-space: nowrap; padding: 7px;"><a style="' + styles.button + '" href="!tl set-marker ' + icon.tag.replace('::','=') + '">Set Marker</a></td>';
+                message += '<td style="text-align: center; white-space: nowrap; padding: 2px;"><a style="' + styles.button + '" href="!tl set-marker ' + icon.tag.replace('::','=') + '">Set Marker</a></td>';
             }
             message += '</tr>';
         });
@@ -192,24 +194,24 @@ var TokenLocker = TokenLocker || (function () {
     },
 
     getMarker = function (marker, style = '') {
-        var return_marker = '',
-        marker_style = 'width: 24px; height: 24px;' + style,
-        status_markers = _.pluck(MARKERS, 'tag'),
-        alt_marker = _.find(ALT_MARKERS, function (x) { return x.tag == marker; });
+        var marker_style = 'width: 24px; height: 24px;' + style;
+        var return_marker = '<img src="" width="24" height="24" style="' + marker_style + ' border: 1px solid #ccc;" alt=" " />';
+        if (typeof marker != 'undefined' && typeof marker.tag != 'undefined') {
+            var status_markers = _.pluck(MARKERS, 'tag'),
+            alt_marker = _.find(ALT_MARKERS, function (x) { return x.tag == marker.tag; });
 
-        if (_.find(status_markers, function (x) { return x == marker; })) {
-            var icon = _.find(MARKERS, function (x) { return x.tag == marker; });
-            return_marker = '<img src="' + icon.url + '" width="24" height="24" style="' + marker_style + '" />';
-        } else if (typeof alt_marker !== 'undefined') {
-            if (alt_marker.url === 'X') {
-                marker_style += 'color: #C91010; font-size: 30px; line-height: 24px; font-weight: bold; text-align: center; padding-top: 0px; overflow: hidden;';
-                return_marker = '<div style="' + marker_style + '">X</div>';
-            } else {
-                marker_style += 'background-color: ' + alt_marker.url + '; border: 1px solid #fff; border-radius: 50%;';
-                return_marker = '<div style="' + marker_style + '"></div>';
+            if (_.find(status_markers, function (x) { return x == marker.tag; })) {
+                var icon = _.find(MARKERS, function (x) { return x.tag == marker.tag; });
+                return_marker = '<img src="' + icon.url + '" width="24" height="24" style="' + marker_style + '" />';
+            } else if (typeof alt_marker !== 'undefined') {
+                if (alt_marker.url === 'X') {
+                    marker_style += 'color: #C91010; font-size: 30px; line-height: 24px; font-weight: bold; text-align: center; padding-top: 0px; overflow: hidden;';
+                    return_marker = '<div style="' + marker_style + '">X</div>';
+                } else {
+                    marker_style += 'background-color: ' + alt_marker.url + '; border: 1px solid #fff; border-radius: 50%;';
+                    return_marker = '<div style="' + marker_style + '"></div>';
+                }
             }
-        } else {
-            return_marker = '<div style="' + marker_style + ' color: #c00;">--</div>';
         }
         return return_marker;
     },
